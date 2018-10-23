@@ -3,7 +3,7 @@
  
 cd solidMotionVisualization
  
-for i in `seq 0 0.005 .5`
+for i in `seq 0 0.0005 .1465`
 do
 	cd solidMotionVisualization;
 	mkdir $i
