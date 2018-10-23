@@ -1,3 +1,17 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 forAll(current_pointcloud_,i)
 			{
 
@@ -8,7 +22,7 @@ forAll(current_pointcloud_,i)
 			   vector velocity(0.0,0.0,0.0);                                     //initialising probe point velocity
 
 			   //const volVectorField& U =mesh_.lookupObject<volVectorField>("U");   
-			   labelHashSet cell_neighbors=findNeighbourCells(probePoint);
+			   labelHashSet cell_neighbors=findNeighbourCells(probePoint, mesh);
 
                
 
@@ -16,7 +30,7 @@ forAll(current_pointcloud_,i)
 							forAllConstIter(labelHashSet, cell_neighbors,iter) 
 					   	 		{
 									  label celli = iter.key();
-									  vector cellicentre=mesh_.cellCentres()[celli];
+									  vector cellicentre=mesh.cellCentres()[celli];
 									  scalar W=weight(probePoint,cellicentre);
 
 								 	  //Info<<"U of neighbour cell"<<celli<<"is"<<U[celli]<<endl;

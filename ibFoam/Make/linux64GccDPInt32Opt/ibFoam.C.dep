@@ -774,6 +774,7 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/solutionControlTemplates.C \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/solutionControlI.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/pimpleControlI.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/pisoControlI.H \
+$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/labelListIOList.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addCheckCaseOptions.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/setRootCase.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/listOptions.H \
@@ -782,7 +783,6 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/createTime.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/createMesh.H \
 createFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createPhi.H \
-$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/labelListIOList.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/initContinuityErrs.H \
 volume.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/CourantNo.H \

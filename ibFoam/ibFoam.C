@@ -62,8 +62,149 @@ Description
 
 #include "fvCFD.H"
 #include "pisoControl.H"
-
+#include "labelListIOList.H"
+ 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+//TODO check whether the cloud point is in mesh or not
+
+
+
+Foam::labelHashSet findNeighbourCells(vector probePoint, fvMesh& mesh)
+{
+    
+     
+
+      // find cell containing this point
+      label celli = mesh.findCell(probePoint);
+
+      // container for neighbours set by dumping the cell containing it
+      labelHashSet neighbourCellSet(0);
+      neighbourCellSet.set(celli);
+
+     
+						// number of layers
+						int nLayers = 2;
+						for (int n = 0; n < nLayers; n++)
+						{
+								// make a copy of marked cells
+								labelHashSet markedNeighbours = neighbourCellSet;
+
+								// loop over all marked cells
+								forAllConstIter(labelHashSet, markedNeighbours,iter)
+								{
+											celli = iter.key();
+											 
+											// get points of celli
+											labelList celliPoints = mesh.cellPoints()[celli];
+
+											forAll(celliPoints,j)
+											{
+												// get neighbor cells of j th point
+												labelList cellJNeighbours = mesh.pointCells()[celliPoints[j]];
+
+												// append these cells in neighbourCellSet
+												forAll(cellJNeighbours, k)
+												{
+													neighbourCellSet.set(cellJNeighbours[k]);
+												 
+												}
+				
+											}
+								 }  
+
+                         }
+ 
+    return neighbourCellSet;
+
+}
+ 
+Foam::scalar weight(Foam::vector xcloud, Foam::vector xgrid)
+{
+
+	scalar hx=.05;  //TODO read from mesh
+    scalar hy=.05;
+    scalar hz=.05;
+	scalar phi1;
+	scalar phi2;
+    scalar phi3;
+
+///computing scaled distance between grid point and cloud point 
+   scalar r1 = (1/hx)*(xgrid[0]-xcloud[0]);
+   scalar r2 = (1/hy)*(xgrid[1]-xcloud[1]);
+   scalar r3 = (1/hz)*(xgrid[2]-xcloud[2]);
+
+	 r1=fabs(r1);
+	 r2=fabs(r2);
+     r3=fabs(r3);
+     //Info<<"r1 ="<<r1<<endl;
+     //Info<<"r2 ="<<r2<<endl;
+     //Info<<"r3 ="<<r3<<endl;
+
+///computing phi1
+
+	if (r1<=1.0)
+	{
+		phi1=(1.0/8.0)*(3.0-2.0*r1+Foam::sqrt(1.0+4.0*r1-4.0*r1*r1));
+	} 
+	else if(r1>=1.0 && r1<=2.0)
+	{
+		phi1=(1.0/8.0)*(5.0-2.0*r1-Foam::sqrt(-7.0+12.0*r1-4.0*r1*r1));
+	} 
+	else
+	{
+		phi1=0.0;
+	} 
+
+
+///computing phi2
+
+	if (r2<=1.0)
+	{
+		phi2=(1.0/8.0)*(3.0-2.0*r2+Foam::sqrt(1.0+4.0*r2-4.0*r2*r2));
+    } 
+	else if(r2>=1.0 && r2<=2.0)
+	{
+		phi2=(1.0/8.0)*(5.0-2.0*r2-Foam::sqrt(-7.0+12.0*r2-4.0*r2*r2));
+	} 
+	else
+	{
+		phi2=0.0;
+	}
+
+///computing phi3
+
+	if (r3<=1.0)
+	{
+		phi3=(1.0/8.0)*(3.0-2.0*r3+Foam::sqrt(1.0+4.0*r3-4.0*r3*r3));
+    } 
+	else if(r3>=1.0 && r3<=2.0)
+	{
+		phi3=(1.0/8.0)*(5.0-2.0*r3-Foam::sqrt(-7.0+12.0*r3-4.0*r3*r3));
+	} 
+	else
+	{
+		phi3=0.0;
+	}
+ 
+
+
+ scalar w=(phi1/hx)*(phi2/hy)*(phi3/hz);
+
+ return w;
+
+}
+
+
+
+
+
+
+
+ 
+//------------------------
+
 
 int main(int argc, char *argv[])
 {
@@ -75,16 +216,18 @@ int main(int argc, char *argv[])
 
     #include "createFields.H"
     #include "initContinuityErrs.H"
+     
+
 
     // * * * * * * * * * * * * * * GEOMETRY* * * * * * * * * * * * * * * * * * * //
 
-        #include "volume.H"                     //volume of solid mesh
+      #include "volume.H"                     //volume of solid mesh
 
 
         scalar hx=.05;                          //TODO read from mesh
         scalar hy=.05;
         scalar hz=.05;
-        scalar delta=0.005;                     //TODO read time step
+        scalar delta= 0.0005;                     //TODO read time step
 
    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -99,25 +242,25 @@ int main(int argc, char *argv[])
          #include "CourantNo.H"
 
 
-     pointField temporary_pointcloud_;                                                   //initialising temporary points X(n+1/2)
+     pointField temporary_pointcloud_(pointcloud_.size());                                                    //initialising temporary points X(n+1/2)
      
 
      Info<< "\n deform solid for first half time step\n" << endl;
-         #include "deform1.H"                                                            //deform solid        X(n+1/2) 
+         #include "deform1.H"                                                             //deform solid        X(n+1/2) 
 
 
      Info<< "\n Computes Lagrangian nodal force at half time step\n" << endl;      
-         #include "Force.H"                                                              //compute solid force F(n+1/2) 
+         #include "Force.H"                                                               //compute solid force F(n+1/2) 
 
 
 
      Info<< "\n Spread the forces to the fluid gird\n" << endl;       
-         #include "spread.H"                                                             //spread force        f(n+1/2) 
+         #include "spread.H"                                                              //spread force        f(n+1/2) 
   
 
 
      Info<< "\n Solve for velocity and pressure at first half time step\n" << endl; 
-         #include "predictor.H"                                                          //fluid solver        v(n+1/2) and p(n+1/2)   
+         #include "predictor.H"                                                           //fluid solver        v(n+1/2) and p(n+1/2)   
 
 
 
@@ -139,7 +282,7 @@ int main(int argc, char *argv[])
 
         runTime.printExecutionTime(Info);
 
-		Info<<"fluid solver end"<<endl;
+		Info<<"fluid solver end"<<endl; 
     }
 
     Info<< "Hey Don't worry I'm running\n" << endl;

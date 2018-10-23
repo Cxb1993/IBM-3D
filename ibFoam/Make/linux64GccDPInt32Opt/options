@@ -50,10 +50,14 @@
 
 # 10 "<command-line>" 2
 # 1 "Make/options"
-EXE_INC = -I$(LIB_SRC)/finiteVolume/lnInclude -I$(LIB_SRC)/meshTools/lnInclude -Iweight -Ifind_neighbours
+EXE_INC = -I$(LIB_SRC)/finiteVolume/lnInclude -I$(LIB_SRC)/meshTools/lnInclude 	-I$(LIB_SRC)/OpenFOAM/lnInclude 
 
 
 
 
 
-EXE_LIBS = -lfiniteVolume -lmeshTools -L$(FOAM_USER_LIBBIN) -lweight -L$(FOAM_USER_LIBBIN) -lfind_neighbours
+EXE_LIBS = -lfiniteVolume -lmeshTools 
+
+
+
+ 

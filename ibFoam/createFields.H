@@ -108,7 +108,7 @@ pointIOField current_pointcloud_
 
 
  
-#include "labelListIOList.H"
+ 
 
 Info<<"Reading connectivity matrix\n"<<endl;
 labelListIOList connectivity_matrix_

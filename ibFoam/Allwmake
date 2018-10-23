@@ -1,7 +1,0 @@
-#!/bin/bash
-
- 
-wmake libso find_neighbours
-wmake libso weight
-wmake libso interpolate
-wmake
